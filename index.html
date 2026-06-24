@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 운세</title>
+<meta property="og:title" content="오늘의 운세">
+<meta property="og:description" content="띠별 오늘의 운세, 운세지수, 추천 점심메뉴까지 매일 06:00 자동 업데이트">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="오늘의 운세">
+<meta name="twitter:description" content="띠별 오늘의 운세, 운세지수, 추천 점심메뉴까지 매일 06:00 자동 업데이트">
+<style>
+  :root{
+    --bg:#f7f8fb;
+    --card-bg:#ffffff;
+    --text:#1f2430;
+    --sub:#6b7280;
+    --accent:#ff7a59;
+    --accent2:#5b8def;
+    --border:#e8eaf0;
+    --shadow:0 4px 16px rgba(20,20,40,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:32px 16px 64px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+  header{text-align:center;margin-bottom:32px;}
+  header h1{font-size:28px;margin:0 0 8px;letter-spacing:-0.5px;}
+  header .date{color:var(--sub);font-size:15px;}
+  header .next-update{color:var(--sub);font-size:12px;margin-top:6px;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:18px;
+  }
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:20px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:transform .15s ease;
+  }
+  .card:hover{transform:translateY(-3px);}
+  .card-top{display:flex;align-items:center;gap:12px;}
+  .emoji{
+    font-size:42px;
+    width:60px;height:60px;
+    display:flex;align-items:center;justify-content:center;
+    background:#fdf1ec;
+    border-radius:14px;
+    flex-shrink:0;
+  }
+  .name-box .name{font-size:17px;font-weight:700;}
+  .name-box .years{font-size:12px;color:var(--sub);}
+  .fortune-section{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .fortune-section .label{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--accent2);
+  }
+  .fortune-section .text{
+    font-size:13px;
+    line-height:1.55;
+    color:#3a3f4b;
+  }
+  .lunch-box{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#f5f8ff;
+    border-radius:10px;
+    padding:8px 10px;
+    margin-top:2px;
+  }
+  .lunch-box .lunch-emoji{font-size:20px;}
+  .lunch-box .lunch-text{font-size:13px;font-weight:600;color:#33415c;}
+  .lunch-box .lunch-label{font-size:11px;color:var(--sub);display:block;font-weight:400;}
+  .score-row{display:flex;align-items:center;gap:8px;margin-top:auto;}
+  .score-label{font-size:12px;color:var(--sub);white-space:nowrap;}
+  .score-bar{
+    flex:1;
+    height:8px;
+    background:#eef0f5;
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .score-fill{
+    height:100%;
+    border-radius:6px;
+    background:linear-gradient(90deg,var(--accent2),var(--accent));
+  }
+  .score-num{font-size:13px;font-weight:700;color:var(--accent);min-width:34px;text-align:right;}
+  footer{
+    text-align:center;
+    margin-top:40px;
+    font-size:11px;
+    color:#a0a4ae;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🔮 오늘의 띠별 운세</h1>
+    <div class="date" id="todayDate">-</div>
+    <div class="next-update" id="nextUpdate">매일 오전 06:00 자동 업데이트</div>
+  </header>
+  <div class="grid" id="grid"></div>
+  <footer>본 콘텐츠는 자동 생성된 운세이며, 매일 06:00에 새 운세로 갱신됩니다.</footer>
+</div>
+
+<script>
+const ZODIACS = [
+  {key:"쥐",   emoji:"🐭", years:"1960, 1972, 1984, 1996, 2008, 2020"},
+  {key:"소",   emoji:"🐮", years:"1961, 1973, 1985, 1997, 2009, 2021"},
+  {key:"호랑이",emoji:"🐯", years:"1950, 1962, 1974, 1986, 1998, 2010, 2022"},
+  {key:"토끼", emoji:"🐰", years:"1951, 1963, 1975, 1987, 1999, 2011, 2023"},
+  {key:"용",   emoji:"🐲", years:"1952, 1964, 1976, 1988, 2000, 2012, 2024"},
+  {key:"뱀",   emoji:"🐍", years:"1953, 1965, 1977, 1989, 2001, 2013, 2025"},
+  {key:"말",   emoji:"🐴", years:"1954, 1966, 1978, 1990, 2002, 2014, 2026"},
+  {key:"양",   emoji:"🐑", years:"1955, 1967, 1979, 1991, 2003, 2015, 2027"},
+  {key:"원숭이",emoji:"🐵", years:"1956, 1968, 1980, 1992, 2004, 2016, 2028"},
+  {key:"닭",   emoji:"🐔", years:"1957, 1969, 1981, 1993, 2005, 2017, 2029"},
+  {key:"개",   emoji:"🐶", years:"1958, 1970, 1982, 1994, 2006, 2018, 2030"},
+  {key:"돼지", emoji:"🐷", years:"1959, 1971, 1983, 1995, 2007, 2019, 2031"},
+];
+
+// 총운
+const GENERAL_POOL = [
+  "차분하게 하루를 시작하면 예상치 못한 좋은 소식이 들려올 수 있어요. 아침의 첫 결정이 오후까지 분위기를 좌우하니, 서두르지 말고 여유를 갖고 움직이세요.",
+  "작은 결정 하나가 큰 변화를 만드는 날입니다. 평소보다 신중하게 움직이면 좋은 결과로 이어지고, 주변에서도 그 신중함을 알아봐 줄 거예요.",
+  "전반적으로 흐름이 안정적인 하루입니다. 무리하게 새 일을 벌이기보다는 진행 중인 일을 마무리하는 데 집중하면 만족스러운 결과를 얻습니다.",
+  "직감이 평소보다 잘 맞는 날이에요. 망설였던 일이 있다면 가벼운 마음으로 시도해보세요. 다만 너무 큰 결정은 하루 더 고민하는 편이 안전합니다.",
+  "예상치 못한 변수가 생길 수 있는 하루입니다. 일정에 여유를 30분 정도 더 두고 움직이면 당황할 일이 줄어들어요.",
+  "내면을 돌아보기 좋은 하루입니다. 바쁘더라도 잠시 멈춰 스스로를 점검하는 시간을 가지면 이후 일주일의 방향이 또렷해집니다.",
+  "운의 흐름이 천천히 상승하는 시기입니다. 오늘 하루의 작은 성취가 다음 기회를 끌어오는 씨앗이 될 수 있어요.",
+  "감정 기복이 있을 수 있는 날이니 중요한 대화나 결정은 오후 시간대로 미루는 것이 좋습니다. 컨디션이 회복되면 판단력도 같이 좋아져요.",
+  "주변의 도움을 받기 좋은 흐름입니다. 혼자 끌어안고 있던 고민을 가까운 사람과 나눠보면 생각보다 쉽게 실마리를 찾을 수 있어요.",
+  "평소보다 집중력이 좋은 날이라 미뤄둔 작업을 처리하기에 적합합니다. 오전 시간을 가장 중요한 일에 배치해보세요.",
+  "소소한 행운이 곳곳에서 따라오는 날입니다. 평소 다니지 않던 길이나 새로운 장소에서 의외의 좋은 발견을 할 수 있어요.",
+  "신중함이 필요한 하루예요. 서두르지 않고 한 번 더 확인하는 자세가 작은 실수를 막아주고 결국 더 빠른 결과로 이어집니다."
+];
+// 애정운
+const LOVE_POOL = [
+  "애정운: 솔로라면 우연한 만남에서 호감이 싹틀 수 있는 날이에요. 커플이라면 사소한 배려가 관계를 더 단단하게 만들어줍니다.",
+  "애정운: 오랜만에 연락이 닿는 사람과 깊은 이야기를 나눌 수 있어요. 진심이 담긴 말 한마디가 관계의 거리를 좁혀줍니다.",
+  "애정운: 표현을 아끼지 않는 것이 좋은 날입니다. 마음속에 담아둔 말을 솔직하게 꺼내면 예상보다 좋은 반응을 얻게 돼요.",
+  "애정운: 다소 무심해질 수 있는 하루이니, 의도치 않게 상대에게 서운함을 주지 않도록 작은 관심을 표현해보세요.",
+  "애정운: 가까운 사람과의 관계에서 따뜻한 위로를 받을 수 있는 하루입니다. 곁에 있는 사람의 진심을 새삼 느끼게 돼요.",
+  "애정운: 새로운 인연의 기운이 감돌아요. 평소 다니던 모임이나 약속 자리에서 의외의 좋은 인상을 남길 수 있습니다.",
+  "애정운: 다툼이 있었다면 오늘 먼저 화해의 손을 내밀어보세요. 생각보다 쉽게 풀리는 흐름이 형성돼 있어요.",
+  "애정운: 혼자만의 시간을 충분히 가져도 좋은 날입니다. 스스로를 아끼는 마음이 결국 관계에도 좋은 영향을 줍니다."
+];
+// 재물운
+const MONEY_POOL = [
+  "재물운: 작은 행운이 따르는 흐름이지만 즉흥적인 소비는 피하고 계획적으로 움직이는 것이 좋아요.",
+  "재물운: 예상치 못한 지출이 생길 수 있으니 오늘은 큰 결제 전에 한 번 더 따져보는 습관이 도움이 됩니다.",
+  "재물운: 투자나 재테크 관련 정보가 들어올 수 있는 날입니다. 다만 성급한 결정보다는 충분히 검토한 뒤 움직이세요.",
+  "재물운: 절약한 만큼 보람이 느껴지는 하루예요. 작은 습관이 모여 안정적인 흐름을 만들어갑니다.",
+  "재물운: 금전적으로 도움을 주고받기 좋은 날입니다. 다만 빌려주거나 빌리는 일은 조건을 명확히 해두는 것이 좋아요.",
+  "재물운: 생각지 못한 곳에서 작은 수입이나 보너스 같은 기쁜 소식이 들려올 수 있습니다.",
+  "재물운: 소비보다 저축에 마음이 가는 날입니다. 이 흐름을 따라가면 다음 달 마음이 한결 편해질 거예요."
+];
+// 직장/학업운
+const WORK_POOL = [
+  "직장·학업운: 막혔던 업무나 과제가 풀리는 신호가 보여요. 미뤄둔 일을 다시 들여다보면 의외로 쉽게 진행됩니다.",
+  "직장·학업운: 협업과 소통이 빛을 발하는 날입니다. 팀 단위의 일이라면 좋은 시너지를 기대해도 좋아요.",
+  "직장·학업운: 새로운 제안이나 기회가 찾아올 수 있는 날입니다. 자신감을 갖고 적극적으로 의견을 내보세요.",
+  "직장·학업운: 평소보다 집중력이 높아 까다로운 업무를 처리하기에 좋은 타이밍입니다.",
+  "직장·학업운: 윗사람이나 동료에게 좋은 평가를 받을 수 있는 흐름이에요. 꾸준함이 빛을 발하는 날입니다.",
+  "직장·학업운: 작은 실수가 생기기 쉬우니 마무리 단계에서 한 번 더 검토하는 습관이 필요합니다.",
+  "직장·학업운: 새로운 배움이나 정보가 유익하게 작용하는 날이에요. 평소 관심 있던 분야를 들여다보세요."
+];
+// 오늘의 추천 점심메뉴
+const LUNCH_POOL = [
+  {emoji:"🍜", name:"얼큰한 국물 라면"},
+  {emoji:"🍱", name:"든든한 한식 도시락"},
+  {emoji:"🍣", name:"신선한 연어 초밥"},
+  {emoji:"🍲", name:"든든한 김치찌개"},
+  {emoji:"🥗", name:"가벼운 샐러드 한 끼"},
+  {emoji:"🍛", name:"든든한 카레라이스"},
+  {emoji:"🍔", name:"든든한 수제버거"},
+  {emoji:"🍝", name:"크리미한 파스타"},
+  {emoji:"🍕", name:"한 조각의 행복, 피자"},
+  {emoji:"🥪", name:"가볍게 즐기는 샌드위치"},
+  {emoji:"🍚", name:"든든한 제육볶음 백반"},
+  {emoji:"🍤", name:"바삭한 튀김 한 상"},
+  {emoji:"🍗", name:"기분 전환엔 치킨"},
+  {emoji:"🍙", name:"든든한 한 끼 비빔밥"},
+  {emoji:"🥘", name:"뜨끈한 부대찌개"},
+  {emoji:"🍳", name:"든든한 오므라이스"},
+  {emoji:"🍲", name:"속을 데워주는 순두부찌개"},
+  {emoji:"🍜", name:"칼칼한 짬뽕"},
+  {emoji:"🥟", name:"든든한 만두 한 그릇"},
+  {emoji:"🍖", name:"든든하게 고기 한 끼"}
+];
+
+// 날짜+띠 문자열을 시드로 만드는 간단한 해시 (mulberry32 기반)
+function strToSeed(str){
+  let h = 1779033703 ^ str.length;
+  for(let i=0;i<str.length;i++){
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return h >>> 0;
+}
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function getTodayKey(){
+  const now = new Date();
+  // 06:00 이전이면 '운세상 어제'로 취급해 06시 기준으로 갱신되도록 함
+  const ref = new Date(now);
+  if (now.getHours() < 6) ref.setDate(ref.getDate() - 1);
+  const y = ref.getFullYear(), m = String(ref.getMonth()+1).padStart(2,"0"), d = String(ref.getDate()).padStart(2,"0");
+  return {key:`${y}-${m}-${d}`, displayDate: ref};
+}
+
+function renderFortunes(){
+  const {key, displayDate} = getTodayKey();
+
+  document.getElementById("todayDate").textContent =
+    displayDate.toLocaleDateString("ko-KR", {year:"numeric", month:"long", day:"numeric", weekday:"long"}) + " 기준";
+
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  ZODIACS.forEach(z => {
+    const rng = mulberry32(strToSeed(key + "_" + z.key));
+    const general = GENERAL_POOL[Math.floor(rng() * GENERAL_POOL.length)];
+    const love = LOVE_POOL[Math.floor(rng() * LOVE_POOL.length)];
+    const money = MONEY_POOL[Math.floor(rng() * MONEY_POOL.length)];
+    const work = WORK_POOL[Math.floor(rng() * WORK_POOL.length)];
+    const lunch = LUNCH_POOL[Math.floor(rng() * LUNCH_POOL.length)];
+    const score = 55 + Math.floor(rng() * 46); // 55~100
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="emoji">${z.emoji}</div>
+        <div class="name-box">
+          <div class="name">${z.key}띠</div>
+          <div class="years">${z.years}</div>
+        </div>
+      </div>
+      <div class="fortune-section">
+        <span class="label">총운</span>
+        <span class="text">${general}</span>
+      </div>
+      <div class="fortune-section">
+        <span class="text">${love}</span>
+      </div>
+      <div class="fortune-section">
+        <span class="text">${money}</span>
+      </div>
+      <div class="fortune-section">
+        <span class="text">${work}</span>
+      </div>
+      <div class="lunch-box">
+        <span class="lunch-emoji">${lunch.emoji}</span>
+        <span class="lunch-text"><span class="lunch-label">오늘의 추천 점심메뉴</span>${lunch.name}</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">운세지수</span>
+        <div class="score-bar"><div class="score-fill" style="width:${score}%"></div></div>
+        <span class="score-num">${score}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// 다음 06:00까지 남은 시간을 계산해 자동 새로고침 예약
+function scheduleNextUpdate(){
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(6,0,0,0);
+  if (now >= next) next.setDate(next.getDate() + 1);
+
+  const msUntilNext = next - now;
+  document.getElementById("nextUpdate").textContent =
+    `다음 갱신: ${next.toLocaleDateString("ko-KR",{month:"long",day:"numeric"})} 06:00 (매일 자동)`;
+
+  setTimeout(() => {
+    renderFortunes();
+    scheduleNextUpdate();
+  }, msUntilNext);
+}
+
+renderFortunes();
+scheduleNextUpdate();
+</script>
+</body>
+</html>
