@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>오늘의 운세</title>
 <meta property="og:title" content="오늘의 운세">
-<meta property="og:description" content="띠별 오늘의 운세, 운세지수, 추천 점심메뉴까지 매일 06:00 자동 업데이트">
+<meta property="og:description" content="띠별 오늘의 운세, 운세지수, 추천 점심메뉴, 행운의 아이템까지 매일 06:00 자동 업데이트">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="오늘의 운세">
-<meta name="twitter:description" content="띠별 오늘의 운세, 운세지수, 추천 점심메뉴까지 매일 06:00 자동 업데이트">
+<meta name="twitter:description" content="띠별 오늘의 운세, 운세지수, 추천 점심메뉴, 행운의 아이템까지 매일 06:00 자동 업데이트">
 <style>
   :root{
     --bg:#f7f8fb;
@@ -30,10 +30,77 @@
     padding:32px 16px 64px;
   }
   .wrap{max-width:1080px;margin:0 auto;}
-  header{text-align:center;margin-bottom:32px;}
+  header{text-align:center;margin-bottom:24px;}
   header h1{font-size:28px;margin:0 0 8px;letter-spacing:-0.5px;}
   header .date{color:var(--sub);font-size:15px;}
   header .next-update{color:var(--sub);font-size:12px;margin-top:6px;}
+
+  /* 👑 오늘의 최고 행운 띠 배너 */
+  .rank-banner{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    width:100%;
+    max-width:560px;
+    margin:0 auto 20px;
+    padding:13px 18px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(90deg,#fff3ec,#eef3ff);
+    box-shadow:0 3px 12px rgba(255,122,89,0.15);
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    color:#3a3f4b;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .rank-banner:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(255,122,89,0.25);}
+  .rank-banner .crown{font-size:20px;}
+  .rank-banner .rank-emoji{font-size:22px;}
+  .rank-banner .rank-score{color:var(--accent);}
+
+  /* 내 띠 바로가기 칩 */
+  .chip-scroll{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding:6px 4px 14px;
+    margin:0 auto 6px;
+    max-width:1080px;
+    scrollbar-width:thin;
+    -webkit-overflow-scrolling:touch;
+  }
+  .chip-scroll::-webkit-scrollbar{height:6px;}
+  .chip-scroll::-webkit-scrollbar-thumb{background:#dfe2ea;border-radius:3px;}
+  .chip{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    padding:7px 13px;
+    border:1px solid var(--border);
+    border-radius:999px;
+    background:var(--card-bg);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+    color:var(--text);
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .chip .chip-emoji{font-size:16px;}
+  .chip .chip-score{font-size:11px;font-weight:700;color:var(--accent2);}
+  .chip:hover{border-color:var(--accent2);background:#f5f8ff;transform:translateY(-1px);}
+  .chip.my-chip{
+    background:linear-gradient(90deg,#fff3ec,#fff8e8);
+    border-color:var(--accent);
+    color:#c2552f;
+  }
+  .chip .chip-star{font-size:12px;}
+
   .grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -49,8 +116,22 @@
     flex-direction:column;
     gap:10px;
     transition:transform .15s ease;
+    scroll-margin-top:16px;
   }
   .card:hover{transform:translateY(-3px);}
+  .card.highlight{
+    animation:cardGlow 1.6s ease;
+  }
+  @keyframes cardGlow{
+    0%{box-shadow:0 0 0 0 rgba(255,122,89,0.0);transform:scale(1);}
+    25%{box-shadow:0 0 0 5px rgba(255,122,89,0.35);transform:scale(1.02);border-color:var(--accent);}
+    60%{box-shadow:0 0 0 3px rgba(255,122,89,0.2);transform:scale(1.01);}
+    100%{box-shadow:var(--shadow);transform:scale(1);border-color:var(--border);}
+  }
+  .card.my-card{
+    border:1.5px solid var(--accent);
+    background:linear-gradient(180deg,#fffaf6 0%,#ffffff 60%);
+  }
   .card-top{display:flex;align-items:center;gap:12px;}
   .emoji{
     font-size:42px;
@@ -60,7 +141,15 @@
     border-radius:14px;
     flex-shrink:0;
   }
-  .name-box .name{font-size:17px;font-weight:700;}
+  .name-box .name{font-size:17px;font-weight:700;display:flex;align-items:center;gap:6px;}
+  .name-box .my-badge{
+    font-size:10.5px;
+    font-weight:700;
+    color:#fff;
+    background:var(--accent);
+    border-radius:999px;
+    padding:2px 8px;
+  }
   .name-box .years{font-size:12px;color:var(--sub);}
   .fortune-section{
     display:flex;
@@ -89,7 +178,37 @@
   .lunch-box .lunch-emoji{font-size:20px;}
   .lunch-box .lunch-text{font-size:13px;font-weight:600;color:#33415c;}
   .lunch-box .lunch-label{font-size:11px;color:var(--sub);display:block;font-weight:400;}
-  .score-row{display:flex;align-items:center;gap:8px;margin-top:auto;}
+
+  /* 오늘의 행운 요소 */
+  .lucky-box{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    background:linear-gradient(135deg,#fdf6ff,#f0f7ff);
+    border:1px dashed #d9d3f0;
+    border-radius:10px;
+    padding:10px 12px;
+  }
+  .lucky-box .lucky-title{
+    font-size:11px;
+    font-weight:700;
+    color:#8b6fd8;
+    margin-bottom:2px;
+  }
+  .lucky-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#3a3f4b;}
+  .lucky-row .lucky-emoji{font-size:15px;flex-shrink:0;}
+  .lucky-row .lucky-key{color:var(--sub);font-size:11.5px;flex-shrink:0;}
+  .lucky-row .lucky-val{font-weight:700;color:#4a4e8f;}
+  .lucky-swatch{
+    display:inline-block;
+    width:12px;height:12px;
+    border-radius:50%;
+    margin-right:4px;
+    vertical-align:-1px;
+    border:1px solid rgba(0,0,0,0.08);
+  }
+
+  .score-row{display:flex;align-items:center;gap:8px;}
   .score-label{font-size:12px;color:var(--sub);white-space:nowrap;}
   .score-bar{
     flex:1;
@@ -104,11 +223,88 @@
     background:linear-gradient(90deg,var(--accent2),var(--accent));
   }
   .score-num{font-size:13px;font-weight:700;color:var(--accent);min-width:34px;text-align:right;}
+
+  /* 공유 버튼 */
+  .share-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    width:100%;
+    margin-top:2px;
+    padding:10px 12px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(90deg,#5b8def,#7aa5f5);
+    color:#fff;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .share-btn:hover{opacity:0.9;transform:translateY(-1px);}
+  .share-btn:active{transform:translateY(0);}
+
+  /* ⭐ 내 띠 저장 버튼 */
+  .save-btn{
+    align-self:flex-start;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    margin-top:2px;
+    padding:7px 12px;
+    border:1px solid var(--border);
+    border-radius:999px;
+    background:#fff;
+    font-family:inherit;
+    font-size:12px;
+    font-weight:600;
+    color:var(--sub);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .save-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .save-btn.saved{
+    background:linear-gradient(90deg,#fff3ec,#fff8e8);
+    border-color:var(--accent);
+    color:#c2552f;
+    font-weight:700;
+  }
+
+  /* 토스트 */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:36px;
+    transform:translateX(-50%) translateY(20px);
+    background:rgba(31,36,48,0.92);
+    color:#fff;
+    font-size:13.5px;
+    font-weight:600;
+    padding:12px 20px;
+    border-radius:999px;
+    box-shadow:0 6px 24px rgba(20,20,40,0.25);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+    z-index:100;
+    max-width:88vw;
+    text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
   footer{
     text-align:center;
     margin-top:40px;
     font-size:11px;
     color:#a0a4ae;
+  }
+  @media (max-width:480px){
+    body{padding:24px 12px 56px;}
+    header h1{font-size:23px;}
+    .grid{grid-template-columns:1fr;}
+    .rank-banner{font-size:13.5px;padding:11px 14px;}
   }
 </style>
 </head>
@@ -119,9 +315,15 @@
     <div class="date" id="todayDate">-</div>
     <div class="next-update" id="nextUpdate">매일 오전 06:00 자동 업데이트</div>
   </header>
+  <button class="rank-banner" id="rankBanner" style="display:none" aria-label="1위 띠 카드로 이동">
+    <span class="crown">👑</span>
+    <span id="rankBannerText">오늘의 최고 행운 띠</span>
+  </button>
+  <div class="chip-scroll" id="chipScroll" aria-label="띠 바로가기"></div>
   <div class="grid" id="grid"></div>
   <footer>본 콘텐츠는 자동 생성된 운세이며, 매일 06:00에 새 운세로 갱신됩니다.</footer>
 </div>
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 const ZODIACS = [
@@ -208,6 +410,42 @@ const LUNCH_POOL = [
   {emoji:"🥟", name:"든든한 만두 한 그릇"},
   {emoji:"🍖", name:"든든하게 고기 한 끼"}
 ];
+// 오늘의 행운 요소
+const LUCKY_COLORS = [
+  {name:"네이비 블루",  hex:"#2b4a7d"},
+  {name:"에메랄드 그린",hex:"#2fb08c"},
+  {name:"체리 레드",    hex:"#d94a5e"},
+  {name:"크림 옐로우",  hex:"#f2d98c"},
+  {name:"라벤더",       hex:"#a58fd8"},
+  {name:"코랄 오렌지",  hex:"#ff8f6b"},
+  {name:"민트 그린",    hex:"#8fd8c2"},
+  {name:"로즈 핑크",    hex:"#f2a0b5"},
+  {name:"스카이 블루",  hex:"#7fb8f0"},
+  {name:"샌드 베이지",  hex:"#d9c4a3"},
+  {name:"딥 퍼플",      hex:"#6b4a9e"},
+  {name:"차트리스",     hex:"#c2d94a"},
+  {name:"테라코타",     hex:"#d87a5b"},
+  {name:"아이보리 화이트",hex:"#f5efe2"},
+  {name:"블루 그레이",  hex:"#7a8ba3"},
+  {name:"버건디",       hex:"#8e3a52"}
+];
+const LUCKY_TIMES = [
+  "오전 09:00 ~ 11:00",
+  "오전 10:00 ~ 12:00",
+  "오전 11:00 ~ 13:00",
+  "정오 12:00 ~ 14:00",
+  "오후 13:00 ~ 15:00",
+  "오후 14:00 ~ 16:00",
+  "오후 15:00 ~ 17:00",
+  "오후 16:00 ~ 18:00",
+  "오후 17:00 ~ 19:00",
+  "저녁 19:00 ~ 21:00",
+  "저녁 20:00 ~ 22:00",
+  "새벽을 제외한 하루 종일"
+];
+
+const SITE_URL = "https://junglejjang-crypto.github.io/daily-fortune/";
+const MY_ZODIAC_KEY = "dailyFortune.myZodiac";
 
 // 날짜+띠 문자열을 시드로 만드는 간단한 해시 (mulberry32 기반)
 function strToSeed(str){
@@ -236,57 +474,213 @@ function getTodayKey(){
   return {key:`${y}-${m}-${d}`, displayDate: ref};
 }
 
+function getMyZodiac(){
+  try{
+    return localStorage.getItem(MY_ZODIAC_KEY) || null;
+  }catch(e){ return null; }
+}
+function setMyZodiac(key){
+  try{
+    if(key) localStorage.setItem(MY_ZODIAC_KEY, key);
+    else localStorage.removeItem(MY_ZODIAC_KEY);
+  }catch(e){}
+}
+
+function showToast(msg){
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+// 카드/칩으로 부드럽게 이동 + 하이라이트 애니메이션
+function focusCard(zodiacKey){
+  const card = document.querySelector(`.card[data-zodiac="${zodiacKey}"]`);
+  if(!card) return;
+  card.scrollIntoView({behavior:"smooth", block:"center"});
+  card.classList.remove("highlight");
+  // 애니메이션 재시작을 위한 리플로우
+  void card.offsetWidth;
+  card.classList.add("highlight");
+}
+
+function shareFortune(data){
+  const text =
+    `🔮 ${data.dateLabel} ${data.name} 운세\n` +
+    `━━━━━━━━━━━━━━\n` +
+    `${data.general}\n\n` +
+    `${data.love}\n\n` +
+    `${data.money}\n\n` +
+    `${data.work}\n\n` +
+    `🍽️ 추천 점심: ${data.lunch}\n` +
+    `🍀 행운의 색상: ${data.color} / 숫자: ${data.number} / 시간대: ${data.time}\n` +
+    `📊 오늘의 운세지수: ${data.score}점\n` +
+    `━━━━━━━━━━━━━━\n` +
+    `${SITE_URL}`;
+  if(navigator.share){
+    navigator.share({title:"오늘의 운세", text:text, url:SITE_URL})
+      .catch(err => {
+        // 사용자가 공유를 취소한 경우(AbortError)는 조용히 넘어감
+        if(err && err.name !== "AbortError"){
+          copyToClipboard(text, "클립보드에 복사되었습니다!");
+        }
+      });
+  }else{
+    copyToClipboard(text, "클립보드에 복사되었습니다!");
+  }
+}
+
+function copyToClipboard(text, msg){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text)
+      .then(() => showToast(msg))
+      .catch(() => fallbackCopy(text, msg));
+  }else{
+    fallbackCopy(text, msg);
+  }
+}
+function fallbackCopy(text, msg){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try{
+    document.execCommand("copy");
+    showToast(msg);
+  }catch(e){
+    showToast("복사에 실패했습니다. 직접 선택해주세요.");
+  }
+  document.body.removeChild(ta);
+}
+
 function renderFortunes(){
   const {key, displayDate} = getTodayKey();
+  const dateLabel = displayDate.toLocaleDateString("ko-KR", {year:"numeric", month:"long", day:"numeric", weekday:"long"});
+  document.getElementById("todayDate").textContent = dateLabel + " 기준";
 
-  document.getElementById("todayDate").textContent =
-    displayDate.toLocaleDateString("ko-KR", {year:"numeric", month:"long", day:"numeric", weekday:"long"}) + " 기준";
+  const myZodiac = getMyZodiac();
 
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-
-  ZODIACS.forEach(z => {
+  // 1) 모든 띠의 운세를 먼저 계산 (배너·칩·카드 정렬에 모두 사용)
+  const results = ZODIACS.map(z => {
     const rng = mulberry32(strToSeed(key + "_" + z.key));
     const general = GENERAL_POOL[Math.floor(rng() * GENERAL_POOL.length)];
     const love = LOVE_POOL[Math.floor(rng() * LOVE_POOL.length)];
     const money = MONEY_POOL[Math.floor(rng() * MONEY_POOL.length)];
     const work = WORK_POOL[Math.floor(rng() * WORK_POOL.length)];
     const lunch = LUNCH_POOL[Math.floor(rng() * LUNCH_POOL.length)];
+    const color = LUCKY_COLORS[Math.floor(rng() * LUCKY_COLORS.length)];
+    const number = 1 + Math.floor(rng() * 99); // 1~99
+    const time = LUCKY_TIMES[Math.floor(rng() * LUCKY_TIMES.length)];
     const score = 55 + Math.floor(rng() * 46); // 55~100
+    return {z, general, love, money, work, lunch, color, number, time, score, dateLabel};
+  });
 
+  // 2) 내 띠가 저장되어 있으면 맨 앞으로
+  const ordered = [...results];
+  if(myZodiac){
+    const idx = ordered.findIndex(r => r.z.key === myZodiac);
+    if(idx > 0) ordered.unshift(ordered.splice(idx, 1)[0]);
+  }
+
+  // 3) 👑 1위 랭킹 배너
+  const top = results.reduce((a,b) => (b.score > a.score ? b : a), results[0]);
+  const banner = document.getElementById("rankBanner");
+  document.getElementById("rankBannerText").innerHTML =
+    `오늘의 최고 행운 띠: <span class="rank-emoji">${top.z.emoji}</span> <b>${top.z.key}띠</b> <span class="rank-score">(${top.score}점)</span>`;
+  banner.style.display = "flex";
+  banner.onclick = () => focusCard(top.z.key);
+
+  // 4) 바로가기 칩 (카드와 같은 순서)
+  const chipScroll = document.getElementById("chipScroll");
+  chipScroll.innerHTML = "";
+  ordered.forEach(r => {
+    const chip = document.createElement("button");
+    chip.className = "chip" + (r.z.key === myZodiac ? " my-chip" : "");
+    chip.innerHTML =
+      `<span class="chip-emoji">${r.z.emoji}</span>` +
+      `${r.z.key}띠` +
+      (r.z.key === myZodiac ? ` <span class="chip-star">⭐</span>` : "") +
+      ` <span class="chip-score">${r.score}</span>`;
+    chip.title = `${r.z.key}띠 운세 보기 (운세지수 ${r.score}점)`;
+    chip.onclick = () => focusCard(r.z.key);
+    chipScroll.appendChild(chip);
+  });
+
+  // 5) 카드 렌더링
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  ordered.forEach(r => {
+    const isMine = r.z.key === myZodiac;
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = "card" + (isMine ? " my-card" : "");
+    card.dataset.zodiac = r.z.key;
     card.innerHTML = `
       <div class="card-top">
-        <div class="emoji">${z.emoji}</div>
+        <div class="emoji">${r.z.emoji}</div>
         <div class="name-box">
-          <div class="name">${z.key}띠</div>
-          <div class="years">${z.years}</div>
+          <div class="name">${r.z.key}띠${isMine ? '<span class="my-badge">⭐ 내 띠</span>' : ""}</div>
+          <div class="years">${r.z.years}</div>
         </div>
       </div>
       <div class="fortune-section">
         <span class="label">총운</span>
-        <span class="text">${general}</span>
+        <span class="text">${r.general}</span>
       </div>
       <div class="fortune-section">
-        <span class="text">${love}</span>
+        <span class="text">${r.love}</span>
       </div>
       <div class="fortune-section">
-        <span class="text">${money}</span>
+        <span class="text">${r.money}</span>
       </div>
       <div class="fortune-section">
-        <span class="text">${work}</span>
+        <span class="text">${r.work}</span>
       </div>
       <div class="lunch-box">
-        <span class="lunch-emoji">${lunch.emoji}</span>
-        <span class="lunch-text"><span class="lunch-label">오늘의 추천 점심메뉴</span>${lunch.name}</span>
+        <span class="lunch-emoji">${r.lunch.emoji}</span>
+        <span class="lunch-text"><span class="lunch-label">오늘의 추천 점심메뉴</span>${r.lunch.name}</span>
+      </div>
+      <div class="lucky-box">
+        <span class="lucky-title">🍀 오늘의 행운 요소</span>
+        <div class="lucky-row"><span class="lucky-emoji">🎨</span><span class="lucky-key">행운의 색상</span><span class="lucky-val"><span class="lucky-swatch" style="background:${r.color.hex}"></span>${r.color.name}</span></div>
+        <div class="lucky-row"><span class="lucky-emoji">🔢</span><span class="lucky-key">행운의 숫자</span><span class="lucky-val">${r.number}</span></div>
+        <div class="lucky-row"><span class="lucky-emoji">⏰</span><span class="lucky-key">행운의 시간대</span><span class="lucky-val">${r.time}</span></div>
       </div>
       <div class="score-row">
         <span class="score-label">운세지수</span>
-        <div class="score-bar"><div class="score-fill" style="width:${score}%"></div></div>
-        <span class="score-num">${score}</span>
+        <div class="score-bar"><div class="score-fill" style="width:${r.score}%"></div></div>
+        <span class="score-num">${r.score}</span>
       </div>
+      <button class="share-btn" aria-label="${r.z.key}띠 운세 공유하기">📤 운세 공유하기</button>
+      <button class="save-btn${isMine ? " saved" : ""}" aria-label="${r.z.key}띠 내 띠로 저장">
+        ${isMine ? "⭐ 내 띠로 저장됨 · 해제" : "☆ 내 띠로 저장"}
+      </button>
     `;
+    card.querySelector(".share-btn").onclick = () => shareFortune({
+      dateLabel: r.dateLabel,
+      name: r.z.key + "띠",
+      general: r.general,
+      love: r.love,
+      money: r.money,
+      work: r.work,
+      lunch: r.lunch.name,
+      color: r.color.name,
+      number: r.number,
+      time: r.time,
+      score: r.score
+    });
+    card.querySelector(".save-btn").onclick = () => {
+      if(getMyZodiac() === r.z.key){
+        setMyZodiac(null);
+        showToast(`${r.z.key}띠 고정을 해제했어요.`);
+      }else{
+        setMyZodiac(r.z.key);
+        showToast(`${r.z.key}띠가 내 띠로 저장되었어요! 다음 방문부터 맨 위에 표시됩니다. ⭐`);
+      }
+      renderFortunes();
+    };
     grid.appendChild(card);
   });
 }
